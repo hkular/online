@@ -1,0 +1,61 @@
+// Set up the experiment variables
+var rotationAngle; // Angle of the rotated image
+var reportedAngle; // Angle reported by the subject
+var startTime; // Start time of the experiment
+var delayTime = 3000; // Delay period in milliseconds
+
+// Function to handle key presses
+function handleKeyPress(event) {
+  var keyCode = event.keyCode;
+
+  // Left arrow key
+  if (keyCode === 37) {
+    rotateLine(-1); // Rotate line counter-clockwise
+  }
+  // Right arrow key
+  else if (keyCode === 39) {
+    rotateLine(1); // Rotate line clockwise
+  }
+}
+
+// Function to rotate the line
+function rotateLine(direction) {
+  reportedAngle += direction;
+  // Rotate the line based on reportedAngle
+  // Replace this line with your own code to rotate the line
+  console.log("Rotated line by " + direction + " degrees. Reported angle: " + reportedAngle);
+}
+
+// Function to start the experiment
+function startExperiment() {
+  // Generate a random rotation angle for the first image
+  rotationAngle = Math.floor(Math.random() * 360);
+  reportedAngle = 0;
+
+  // Load a random image from the folder
+  var imageFolder = "path/to/your/image/folder/";
+  var imageList = ["image1.jpg", "image2.jpg", "image3.jpg"]; // List of image file names
+  var randomIndex = Math.floor(Math.random() * imageList.length);
+  var randomImage = imageList[randomIndex];
+  var imageUrl = imageFolder + randomImage;
+
+  // Display the image to the subject
+  var imageElement = document.createElement("img");
+  imageElement.src = imageUrl;
+  document.body.appendChild(imageElement);
+
+  // Start the delay period
+  setTimeout(function () {
+    // Hide the image after the delay period
+    document.body.removeChild(imageElement);
+
+    // Record the start time of the reporting phase
+    startTime = new Date().getTime();
+
+    // Listen for key presses during the reporting phase
+    document.addEventListener("keydown", handleKeyPress);
+  }, delayTime);
+}
+
+// Start the experiment when the page is loaded
+window.addEventListener("load", startExperiment);
