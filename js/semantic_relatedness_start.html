@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Semantic relatedness</title>
+        <script src="jspsych/dist/jspsych.js"></script>
+        <script src="jspsych/dist/plugin-html-keyboard-response.js"></script>
+        <script src="jspsych/dist/plugin-html-button-response.js"></script>
+        <script src="jspsych/dist/plugin-audio-keyboard-response.js"></script>
+        <script src="jspsych/dist/plugin-instructions.js"></script>
+        <script src="practice_trial_info.js"></script>
+        <script src="amb_trial_info_v1.js"></script>
+        <script src="amb_trial_info_v2.js"></script>
+        <script src="filler_trial_info.js"></script>
+        <link href="jspsych/dist/jspsych.css" rel="stylesheet">
+    </head>
+    <body></body>
+    <script>
+
+        var jsPsych = initJsPsych({
+            preload_audio: all_audio,
+            show_preload_progress_bar: true,
+            use_webaudio: false,
+            on_finish: function(){
+                jsPsych.data.displayData();
+            }
+            });
+
+        var timeline = [];
+        var repeat_prac = false;
+
+        var version = jsPsych.randomization.sampleWithoutReplacement([1,2],1)[0];
+        console.log('version: ', version);
+
+        var amb_trial_info;
+        if (version ==1) {
+            amg_trial_fino = amb_trial_info_v1;}
+            else{
+                amb_trial_info = amb_trial_info_v2;
+            
+            }
+
+        // combine trial information from the ambiguous word and filler arrays to use in the main task
+        var main_trial_info = amb_trial_info_v1.concat(filler_trial_info);
+        console.log('main trial info: ', main_trial_info);
+
+        // create list of all audio files for preloading
+        var all_audio = [];
+        for (var i=0; i<practice_trial_info.length; i++) {
+            all_audio.push(practice_trial_info[i].target_audio);
+        }
+        for (var i=0; i<main_trial_info.length; i++) {
+            all_audio.push(main_trial_info[i].target_audio);
+        }
+
+        var instructions = {
+            type: jsPsychInstructions,
+            pages: [
+                '<p>In this task, you will hear a spoken word, and then see a written word.</p>'+
+                '<p>You should press the <strong>j</strong> key if the meanings of the two words are <strong>related</strong>.</p>'+
+                '<p>You should press the <strong>f</strong> key if the meanings of the two words are <strong>unrelated</strong>.</p>'+
+                '<p>Click the "Next" button for more instructions.</p>',
+                '<p>Here are some examples of words with <strong>related</strong> meanings:</p>'+
+                '<p>WATER - SWIM</p><p>PETAL - FLOWER</p>'+
+                '<p>In these examples, you would press the <strong>j</strong> key.</p>'+
+                '<p>Here are some examples of words with <strong>unrelated</strong> meanings:'+
+                '<p>APPLE - FANCY</p><p>JUMP - GARAGE</p>'+
+                '<p>In these examples, you would press the <strong>f</strong> key.</p>'+
+                '<p>Click the "Next" button to start.</p>'
+            ],
+            show_clickable_nav: true,
+            post_trial_gap: 1000
+        };
+ 
+
+        var fixation = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: '<span style="font-size:40px;">+</span>',
+            choices: "NO_KEYS",
+            trial_duration: 500,
+            data: {
+                trial_part: 'fixation', 
+                task_part: jsPsych.timelineVariable('task_part')
+            }
+        };
+
+        var target = {
+            type: jsPsychAudioKeyboardResponse,
+            stimulus: jsPsych.timelineVariable('target_audio'),
+            prompt: '<span style="font-size:40px;">+</span>',
+            choices: "NO_KEYS",
+            trial_ends_after_audio: true,
+            data: {
+                target: jsPsych.timelineVariable('target'),
+                probe: jsPsych.timelineVariable('probe'),
+                condition: jsPsych.timelineVariable('condition'),
+                correct_response: jsPsych.timelineVariable('correct_response'),
+                trial_part: 'target',
+                task_part: jsPsych.timelineVariable('task_part')
+            }
+        }; 
+
+        var probe = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: function() {
+                return '<span style="font-size:40px;">' + jsPsych.timelineVariable('probe', true) + '</span>';
+            },
+            choices: ['f','j'],
+            post_trial_gap: 500,
+            data: {
+                target: jsPsych.timelineVariable('target'),
+                probe: jsPsych.timelineVariable('probe'),
+                condition: jsPsych.timelineVariable('condition'),
+                correct_response: jsPsych.timelineVariable('correct_response'),
+                trial_part: 'probe',
+                task_part: jsPsych.timelineVariable('task_part')
+            }, 
+            on_finish: function(data){
+                data.accuracy = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
+                }
+        };
+
+        var feedback = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: function() {
+                var feedback_text = '<span style="color:red;font-size:30px;">Incorrect.</span>';
+                var last_resp_acc = jsPsych.data.getLastTrialData().values()[0].accuracy;
+                if (last_resp_acc == true) {
+                    feedback_text = '<span style="color:green;font-size:30px;">Correct!</span>'
+                }
+                return feedback_text;
+            },
+            choices: "NO_KEYS",
+            trial_duration: 2000
+        };
+
+        var prac_procedure = {
+            timeline: [fixation, target, probe, feedback],
+            timeline_variables: practice_trial_info,
+            randomize_order: true
+        };
+     
+
+        var repeat_prac_message = {
+            type: jsPsychHtmlButtonResponse,
+            stimulus: '<p>  You made too many incorrect responses.</p> <p> You will now repeat the instructions. </p>',
+            choices: ['Next']
+        };
+
+        var repeat_prac_conditional = {
+            timeline: [repeat_prac_message],
+            conditional_function: function () {
+              var last_prac_trials = jsPsych.data.get().filter({trial_part: 'probe'}).last(practice_trial_info.length);
+              var n_correct = last_prac_trials.filter({accuracy: true}).count();
+              var prop_corr = n_correct/practice_trial_info.length;
+              if (prop_corr <0.6) {
+                repeat_prac = true;
+                return true;
+              } else {
+                repeat_prac = false;
+                return false;
+              }
+            
+            }
+        };
+
+
+        var instructions_prac_loop = {
+            timeline:[instructions, prac_procedure, repeat_prac_conditional],
+            loop_function: function(){
+                if (repeat_prac ==true) {
+                    return true;;
+                } else{ 
+                    return false;
+                }
+            }
+        }
+        timeline.push(instructions_prac_loop);
+
+        var start_task = {
+            type: jsPsychHtmlButtonResponse,
+            stimulus: "<p>Great! You're done with the practice trials.</p><p>Now you won't see any feedback about your response.</p><p>Click the 'Next' button to start.</p>",
+            choices: ['Next'],
+            response_ends_trial: true
+        }
+        timeline.push(start_task);
+
+        var main_procedure = {
+            timeline: [fixation, target, probe],
+            timeline_variables: main_trial_info,
+            randomize_order: true
+        };
+        timeline.push(main_procedure);
+
+        var end_screen = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: "Thanks, you're done with the task!", 
+            choices: ['space']
+        };
+        timeline.push(end_screen);
+
+        // run the experiment
+        jsPsych.run(timeline);
+
+    </script>
+</html>

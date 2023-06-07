@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Lexical Decision</title>
+        <script src = "jspsych/dist/jspsych.js"></script>
+        <script src = "jspsych/dist/plugin-html-keyboard-response.js"></script>
+        <script src = "jspsych/dist/plugin-instructions.js"></script>
+        <link href = "jspsych/dist/jspsych.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body></body>
+    <script>
+        //initialize, also want data
+        var jsPsych = initJsPsych({
+        on_finish: function() {
+            jsPsych.data.displayData();
+            } 
+            });
+        var timeline = [];
+        
+        var instructions = {
+            type: jsPsychInstructions,
+            pages: ['Welcome!', '<p>Press the f key when you see a nonword.</p> <p>Press the j key when you see a word.</p> <p>Click the next button to start.'],
+            show_clickable_nav: true,
+        };
+        timeline.push(instructions);
+
+
+        var fixation = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: '<span style = "font-size: 40px;">+</span>',
+            choices: "NO_KEYS",
+            trial_duration: 1000
+        };
+   
+
+        var lexical_trial = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: jsPsych.timelineVariable('stimulus'),
+            choices: ['f', 'j'],
+            post_trial_gap: 500,
+            stimulus_duration: 2000,
+            data: {condition: jsPsych.timelineVariable('condition'), correct_response: jsPsych.timelineVariable('correct_response')},
+            on_finish : function(data){ 
+                if(jsPsych.pluginAPI.compareKeys(data.response, data.correct_response)){
+                data.correct = true;
+                } else {
+                data.correct = false; 
+                 }
+                }
+             };
+
+        var feedback = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: function(){
+                var feedback_text = '<span style="font-size:30px;color:red;" >incorrect</span>';
+                var last_trial = jsPsych.data.getLastTrialData().values()[0].correct;
+                if (last_trial == true) {
+                    feedback_text = '<span style="font-size:30px;color:green;" >correct</span>'
+                }
+                return feedback_text
+            },
+            choices: "NO_KEYS",
+            trial_duration: 3000
+        };
+
+        var trial_info = [
+            {stimulus: '<span style = "font-size: 40px;">apple</span>', condition: 'word', correct_response: 'j'},
+            {stimulus: '<span style = "font-size: 40px;">tree</span>', condition: 'word', correct_response: 'j'},
+            {stimulus: '<span style = "font-size: 40px;">arfe</span>', condition: 'nonword', correct_response: 'f'},
+            {stimulus: '<span style = "font-size: 40px;">appo</span>', condition: 'nonword', correct_response: 'f'}
+
+        ];
+
+        var procedure = {
+            timeline: [fixation, lexical_trial, feedback],
+            timeline_variables: trial_info,
+            randomize_order: true
+        };
+        timeline.push(procedure);
+
+        // run it
+        jsPsych.run(timeline);
+
+    </script>
+    </html>

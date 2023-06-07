@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jspsych/dist/jspsych.js"></script>
+    <script src = "jspsych/dist/plugin-html-keyboard-response.js"></script>
+    <script src = "jspsych/dist/plugin-image-button-response.js"></script>
+    <link href="jspsych/dist/jspsych.css" rel="stylesheet" type="text/css"/>
+</head>
+<body> </body>
+<script>
+//initialize, also want data
+  var jsPsych = initJsPsych({
+  on_finish: function() {
+    jsPsych.data.displayData();
+    } 
+    });
+//create timeline
+    var timeline = [];
+
+// list
+ var words = ['welcome', 'to', 'my', 'experiment'];  
+ for(var i = 0; i<words.length; i++){
+    var words_trial = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: words[i]
+    }
+    timeline.push(words_trial); 
+ }  
+
+/* var welcome_trial = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: 'welcome to my experiment'
+    }   
+// add var to timeline   
+timeline.push(welcome_trial);*/
+
+console.log('message') // user messages
+
+// image trial
+var image_button_trial = {
+    type: jsPsychImageButtonResponse,
+    stimulus: 'jspsych/examples/img/happy_face_1.jpg',
+    choices: ['Happy', 'Sad']
+}
+timeline.push(image_button_trial);
+
+// run it
+jsPsych.run(timeline);
+
+</script>
+</html>
