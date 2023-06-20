@@ -1,61 +1,233 @@
-// Set up the experiment variables
-var rotationAngle; // Angle of the rotated image
-var reportedAngle; // Angle reported by the subject
-var startTime; // Start time of the experiment
-var delayTime = 3000; // Delay period in milliseconds
+<!DOCTYPE html>
+<html>
 
-// Function to handle key presses
-function handleKeyPress(event) {
-  var keyCode = event.keyCode;
+<head>
+    <title>WM_noiseV10</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://bradylab.ucsd.edu/turk/experiments/Holly/jspsych/dist/jspsych.js"></script>
+    <script
+        src="https://bradylab.ucsd.edu/turk/experiments/Holly/jspsych/dist/plugin-instructions.js"></script>
+    <script
+        src="https://bradylab.ucsd.edu/turk/experiments/Holly/jspsych/dist/plugin-html-button-response.js"></script>
+    <script src="https://bradylab.ucsd.edu/turk/experiments/Holly/jspsych/dist/plugin-survey-text.js"></script>
+    <script
+        src="https://bradylab.ucsd.edu/turk/experiments/Holly/jspsych/dist/homemade/plugin-continuous-ori-report.js"></script>  !! write this !!
+    <link rel="stylesheet" href="https://bradylab.ucsd.edu/turk/experiments/Holly/jspsych/dist/jspsych.css">
+</head>
 
-  // Left arrow key
-  if (keyCode === 37) {
-    rotateLine(-1); // Rotate line counter-clockwise
-  }
-  // Right arrow key
-  else if (keyCode === 39) {
-    rotateLine(1); // Rotate line clockwise
-  }
-}
+<body>
+    <script>
+        /* Require a new-ish browser: 
+    ------------------------------------------ */
+        function supportsLiterals() {
+            try { return eval("''===``") }
+            catch (e) { return false; }
+        }
+        if (!supportsLiterals()) {
+            var txt = "Sorry, this experiment requires a newer browser, so yours is not able to be used. The latest Chrome, Firefox, Safari or Edge all work.";
+            alert(txt);
+            document.body.onload = function () { document.body.innerHTML = txt; };
+        }
 
-// Function to rotate the line
-function rotateLine(direction) {
-  reportedAngle += direction;
-  // Rotate the line based on reportedAngle
-  // Replace this line with your own code to rotate the line
-  console.log("Rotated line by " + direction + " degrees. Reported angle: " + reportedAngle);
-}
+        var jsPsych = initJsPsych({
+            show_progress_bar: true,
+            auto_update_progress_bar: false
+        });
 
-// Function to start the experiment
-function startExperiment() {
-  // Generate a random rotation angle for the first image
-  rotationAngle = Math.floor(Math.random() * 360);
-  reportedAngle = 0;
 
-  // Load a random image from the folder
-  var imageFolder = "path/to/your/image/folder/";
-  var imageList = ["image1.jpg", "image2.jpg", "image3.jpg"]; // List of image file names
-  var randomIndex = Math.floor(Math.random() * imageList.length);
-  var randomImage = imageList[randomIndex];
-  var imageUrl = imageFolder + randomImage;
+        var WM_noiseV10_timeline = []; // instantiate timeline
 
-  // Display the image to the subject
-  var imageElement = document.createElement("img");
-  imageElement.src = imageUrl;
-  document.body.appendChild(imageElement);
+        /* Instructions 
+        ------------------------------------------ */
+        var trialList = [];
+        var num_practice_trials = 12;
+        var num_trials = 216;
 
-  // Start the delay period
-  setTimeout(function () {
-    // Hide the image after the delay period
-    document.body.removeChild(imageElement);
+         // capture info from Prolific
+        var subject_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
+        var study_id = jsPsych.data.getURLVariable('STUDY_ID');
+        var session_id = jsPsych.data.getURLVariable('SESSION_ID');
 
-    // Record the start time of the reporting phase
-    startTime = new Date().getTime();
+        jsPsych.data.addProperties({
+            subject_id: subject_id,
+            study_id: study_id,
+            session_id: session_id
+        });
 
-    // Listen for key presses during the reporting phase
-    document.addEventListener("keydown", handleKeyPress);
-  }, delayTime);
-}
+        WM_noiseV10_timeline.push({
+            type: jsPsychInstructions,
+            pages: ['<p>Welcome to the experiment!</p>',
+                '<p>In this experiment, you will have to remember some briefly presented  oriented stimuli. You will need to do '+num_trials+' trials, each of which takes about 4-6 seconds. It should take less than 60 minutes total. <strong>Please do not participate if you do not have normal or corrected-to-normal vision.</strong> It is OK if you do both this study and other similar Prolific studies that require orientation or shape memory. <p>On each trial, you will see a center dot. Your first job is try to always look at the center dot and pay attention to anything else without moving your eyes off the center dot. <p align="center"><img src="berkeley_screenshots/click_to_start.png" width="400" border=0></p> When you click to start the trial, these center dot will be surrounded by a donut with an oriented pattern in it. The donut will be presented only very briefly &mdash; shown for under one second &mdash; so be sure not to click to start the trial until you are ready. <strong>Your job is to remember the orientation of the pattern in the donut the best you can. The fuzziness of the orientation will vary, sometimes it will be clearer and sometimes it will be harder to see the orientation.</strong> </p><p align="center"><img src="berkeley_screenshots/example_stim6.png" width="400" border=0></p> <p>We are interested in your <b>VISUAL</b> memory. So it is important that you do not say descriptive words to yourself (e.g., "horizontal line") or use words to perform the task. If you find yourself struggling not to do this, we suggest you repeat the word "the" over and over in your head when the items are presented. This will help you to remember not to use words to remember the angles.</p>',
 
-// Start the experiment when the page is loaded
-window.addEventListener("load", startExperiment);
+                '<p> Following the presentation of the orientation donut, there will be a "delay" period, during which you will need to remember the orientation. During this delay period, sometimes you will see nothing and sometimes you will see an oriented rectangle. And sometimes you will see the oriented rectangle briefly wiggle.  <p align="center"><img src="berkeley_screenshots/cue_right_color.png" width="400" border=0></p> <p> When you see the rectangle wiggle, like the example above, your job is to report whether you saw it wiggle clockwise or counterclockwise from its main position. In the example above, the correct answer is clockwise.  <p align="center"><img src="berkeley_screenshots/cue_left_ori_left_color.png" width="400" border=0></p> <p>You will report the clockwise and counterclockwise wiggle by pressing the arrow keys on the keyboard. </p> <p align="center"><img src="berkeley_screenshots/cue_left_ori_right_color.png" width="400" border=0></p> <p>After the delay period with or without a rectangle is over, you will be almost immediately tested on your memory of the oriented donut. You will see a line the screen, which you will rotate using the arrow keys on the keyboard to match the orientation you remember. </p> <p align="center"><img src="berkeley_screenshots/example_stim2.png" width="400" border=0><img src="berkeley_screenshots/example_ori_report.png" width="400" border=0></p>',
+
+                '<p>To start off with, we will give you <strong> 12 practice trials</strong> &mdash; Then you will need to do '+num_trials+' trials of the main task. Note that we are interested in studying interference in memory. As a result, this task is designed to be very challenging so that you will make errors! Please do not be discouraged if you find this difficult. What matters is that you are trying your best.</p><p text-align="left">Before beginning, you must give informed consent. Please read the following and indicate your agreement by continuing to the next page to start the practice trials:</p> <div id="consentDiv"><p><u>Consent to Act as a Research Subject:</u></p><p style="text-align:left">Dr. John Serences is conducting a research study to learn more about how attention affects how you see things (perception) and how you make simple decisions. There will be approximately 5,000 participants in the study over the next 10 years.</p><p style="text-align:left">PROCEDURES. If you agree to be in this study by clicking NEXT and continuing to this task, the following will happen to you: You will be presented with stimuli that consist of simple objects presented on a computer screen. You will respond with button presses and/or using your computer mouse.</p> <p style="text-align:left">RISKS. You will be required only to continue to interact with your web browser and make responses for a short duration. Thus, no potential risks or discomforts are anticipated except for the possibility that some tasks may be slightly boring. However, there may be risks that are currently unforeseeable.</p> <p style="text-align:left">REMUNERATION. In consideration of your time and effort you will receive SONA credit for your participation (0.5 credits for 30 minutes).</p><p style="text-align:left">RIGHTS.  If you are injured as a direct result of participation in this research, the University of California will provide any medical care you need to treat those injuries. The University will not provide any other form of compensation to you if you are injured. You may call the Human Research Protections Program at 858-246- 4777 for more information about this, to inquire about your rights as a research subject, or to report research- related problems.</p><p style="text-align:left">BENEFITS.  There will not be any direct benefit to you from these procedures. The investigator, however, may learn more about how human beings pay attention and how this ability affects perception and decision making. </p><p style="text-align:left">EXPLANATION.  Dr. John Serences or a member of his research team has explained this study to you and answered your questions. If you have other questions or research-related problems, you may reach him at 858- 534-3686.</p><p style="text-align:left">VOLUNTARY NATURE OF PARTICIPATION.  Participation in this research is entirely voluntary. There is no cost to you for participating. The alternative to participating is not participating. You may refuse to participate or you may withdraw at any time without jeopardy to the medical care you will receive at this institution, without loss of any access to the care to which you are entitled, or loss of the benefits to which you are entitled. You may also be withdrawn from the study if the investigator feels it is in your best interest or for other study-related purposes. If you wish to withdraw from the study tell a member of the study staff and the testing session will terminate immediately. You will be compensated for the time you have spent.</p><p style="text-align:left">CONFIDENTIALITY.  Research records will be kept confidential to the extent provided by law. Research records will only be accessible by Dr Serences and his research team, and by the UCSD Institutional Review Board. You have received a copy of this consent document. </p><p style="text-align:left">By clicking NEXT, you are indicating that you are at least 18 years old, have read this consent form and agree to participate in this research study. Please print a copy of this page for your records.</p></div>'],
+            show_clickable_nav: true
+
+        })
+        
+        WM_noiseV10_timeline.push({
+            type: jsPsychInstructions,
+            pages: ['First, we will do some practice trials. Click NEXT to proceed.'],
+            show_clickable_nav: true
+        })
+
+        var ori_practice = {
+            timeline: [
+                {
+                    type: jsPsychContinuousConjunctionRetrocue,
+                    data: {is_practice: "yes"},
+                    wheel_spin: false,
+                    set_size: 1,
+                    memory_set_size: 1,
+                    feature_cue: 1,
+                    feature_recall: 1,
+                    feature_separate_objects: false,
+                    probe_position: jsPsych.timelineVariable('probe_position'),
+                    num_placeholders: 2,
+                    feedback: true,
+                }
+            ],
+            timeline_variables: [
+                {probe_position: "Left"},
+                {probe_position: "Right"}
+            ],
+            randomize_order: true,
+            repetitions: 12,
+        }
+        
+        WM_noiseV10_timeline.push(ori_practice);
+        
+
+        WM_noiseV10_timeline.push({
+            type: jsPsychInstructions,
+            pages: ['You are now ready to begin the main task. As a reminder, these tasks are designed to be challenging, so as long as you are trying your best, you are doing great! Click NEXT to proceed.'],
+            show_clickable_nav: true
+        })
+        
+
+        var trialCount = 0;
+        function updateCounter() {
+            trialCount = trialCount + 1;
+            jsPsych.setProgressBar(trialCount / num_trials);
+        }
+
+        var trials = {
+            timeline: [
+                {
+                    type: jsPsychContinuousConjunctionRetrocue,
+                    data: {is_practice: "no"},
+                    wheel_spin: false,
+                    set_size: 2,
+                    memory_set_size: jsPsych.timelineVariable('memory_set_size'),
+                    feature_cue: jsPsych.timelineVariable('feature_cue'),
+                    feature_recall: jsPsych.timelineVariable('feature_recall'),
+                    feature_separate_objects: jsPsych.timelineVariable('feature_separate_objects'),
+                    probe_position: jsPsych.timelineVariable('probe_position'),
+                    num_placeholders: 2,
+                    feedback: true,
+                    on_finish: updateCounter
+                }
+            ],
+            timeline_variables: [
+                {memory_set_size: 1, feature_cue: 1, feature_separate_objects: false, feature_recall: 1, probe_position: "Left"},
+                {memory_set_size: 1, feature_cue: 1, feature_separate_objects: false, feature_recall: 1, probe_position: "Right"},
+
+                {memory_set_size: 1, feature_cue: 2, feature_separate_objects: false, feature_recall: 2, probe_position: "Left"},
+                {memory_set_size: 1, feature_cue: 2, feature_separate_objects: false, feature_recall: 2, probe_position: "Right"},
+
+                {memory_set_size: 1, feature_cue: 3, feature_separate_objects: false, feature_recall: 1, probe_position: "Left"},
+                {memory_set_size: 1, feature_cue: 3, feature_separate_objects: false, feature_recall: 1, probe_position: "Right"},
+
+                {memory_set_size: 1, feature_cue: 3, feature_separate_objects: false, feature_recall: 2, probe_position: "Left"},
+                {memory_set_size: 1, feature_cue: 3, feature_separate_objects: false, feature_recall: 2, probe_position: "Right"},
+
+                {memory_set_size: 2, feature_cue: 3, feature_separate_objects: true, feature_recall: 1, probe_position: "Left"}, 
+                {memory_set_size: 2, feature_cue: 3, feature_separate_objects: true, feature_recall: 1, probe_position: "Right"}, 
+
+                {memory_set_size: 2, feature_cue: 3, feature_separate_objects: true, feature_recall: 2, probe_position: "Left"}, 
+                {memory_set_size: 2, feature_cue: 3, feature_separate_objects: true, feature_recall: 2, probe_position: "Right"}, 
+
+            ],
+            randomize_order: true,
+            repetitions: num_trials/12,
+        }
+
+        berkeley_timeline.push(trials);
+        
+        
+        berkeley_timeline.push({
+            type: jsPsychSurveyText,
+            preamble: "Thank you! You're just about done. If you would, please tell us about yourself:",
+            questions: [
+                { prompt: "How old are you?", name: 'age', rows: 1, columns: 5 },
+                { prompt: "Gender:", name: 'gender', rows: 1, columns: 40 },
+                { prompt: "Any comments? Was it fun? Any technical difficulties?:", name: 'comments', rows: 3, columns: 40 }
+            ],
+            button_label: "Submit",
+            on_finish: function() {SendToServer()}
+        });
+
+        
+        berkeley_timeline.push({
+            type: jsPsychInstructions,
+            pages: ['<p>Thank you! You are all done. Press "Next" to be taken back to Prolific.</p>'],
+            show_clickable_nav: true,
+            on_finish: function () {
+                window.location.assign("https://app.prolific.co/submissions/complete?cc=C12KZ87A");
+            },
+        });
+
+        jsPsych.run(berkeley_timeline);
+
+        // Send the data to the server as JSON: 
+        
+        var SendToServer = () => {
+            console.log('saving data');
+            expt_data = {
+                "curTime": jsPsych.getStartTime(),
+                "sub_id": subject_id,
+                "userAgent": navigator.userAgent,
+                "windowWidth": window.innerWidth,
+                "windowHeight": window.innerHeight,
+                "screenWidth": screen.width,
+                "screenHeight": screen.height,
+                "totalTime": jsPsych.getTotalTime(),
+                "interactionData": jsPsych.data.getInteractionData().json(),
+                "fullData": jsPsych.data.get().json(),
+                "surveyData": jsPsych.data.get().select('response'),
+
+                "rt": jsPsych.data.get().select('rt'),
+                "position_of_items": jsPsych.data.get().select('position_of_items'),
+                "probe_position": jsPsych.data.get().select('probe_position'),
+                "item_angles": jsPsych.data.get().select('item_angles'),
+                "item_colors": jsPsych.data.get().select('item_colors'),
+                "probe_angle": jsPsych.data.get().select('probe_angle'),
+                "reported_angle": jsPsych.data.get().select('reported_angle'),
+                "reported_angle_wrapped": jsPsych.data.get().select('reported_angle_wrapped'),
+                "trial_error": jsPsych.data.get().select('trial_error'),
+                "memory_set_size": jsPsych.data.get().select('memory_set_size'),
+                "feature_cue": jsPsych.data.get().select('feature_cue'),
+                "feature_recall": jsPsych.data.get().select('feature_recall'),
+                "feature_separate_objects": jsPsych.data.get().select('feature_separate_objects'),
+                "display_time": jsPsych.data.get().select('display_time'),
+                "actual_stim1_duration": jsPsych.data.get().select('actual_stim1_duration'),
+                "actual_stim2_duration": jsPsych.data.get().select('actual_stim2_duration'),
+                "isi_time": jsPsych.data.get().select('isi_time'),
+                "pre_retrocue_delay": jsPsych.data.get().select('pre_retrocue_delay'),
+                "retrocue_time": jsPsych.data.get().select('retrocue_time'),
+                "post_retrocue_delay": jsPsych.data.get().select('post_retrocue_delay'),
+            };
+            var dataToServer = {
+                'id': subject_id,
+                'experimenter': 'Janna',
+                'experimentName': 'berkeley_v1',
+                'curData': JSON.stringify(expt_data)
+            };
+            $.post("https://bradylab.ucsd.edu/turk/save.php", dataToServer)
+        }
+        
+
+    </script>
+
+</html>
