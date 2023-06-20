@@ -72,6 +72,12 @@ var jsPsychContinuousOri = (function (jsPsych) {
                 default: 90,
                 description: 'Diameter of each circle in pixels.'
             },
+            num_placeholders: {
+                type: jsPsych.ParameterType.INT,
+                pretty_name: 'Number of locations where items can appear',
+                default: 1,
+                description: 'Number of locations where items can appear'
+            },
             display_time: {
                 type: jsPsych.ParameterType.INT,
                 pretty_name: 'Time to show oris',
@@ -174,7 +180,7 @@ var jsPsychContinuousOri = (function (jsPsych) {
             <div id="contMemoryBox" style="
             width:${width}px; 
             height: ${height}px;">`;
-            var possiblePositions = [];
+            var possiblePositions = []; /* just one position */
             for (var i = 0; i < trial.num_placeholders; i++) {
                 let curTop = (Math.cos((Math.PI * 2) / (trial.num_placeholders) * i) * trial.radius)
                     - trial.item_size / 2 + center;
@@ -234,7 +240,7 @@ var jsPsychContinuousOri = (function (jsPsych) {
                 if (trial.display_time > 0) {
                     for (var i = 0; i < trial.set_size; i++) {
                         document.getElementById('ori').style.backgroundColor = 'black';
-                        document.getElementById('ori').style.transform = 'rotate('+ -1*item_angles[i] + 'deg)';
+                        document.getElementById('ori').style.transform = 'rotate('+ -1*item_angles[i] + 'deg)'; /* horizontal line rotated */
                     }
                 }
                 start_request_anim = ts;
@@ -313,7 +319,7 @@ var jsPsychContinuousOri = (function (jsPsych) {
             -------------------------------- */
             var line_radius = trial.item_size/2 + 50;
             var line_width = 2; /* is this in pixels?!!! */
-            var line_pos = ;
+            var line_pos = ; /* center */
             var line_top = (Math.sin((Math.PI * 2) / (trial.num_placeholders) * line_pos) * trial.radius)
             - line_radius + center;;
             var line_left = (Math.cos((Math.PI * 2) / (trial.num_placeholders) * line_pos) * trial.radius)
