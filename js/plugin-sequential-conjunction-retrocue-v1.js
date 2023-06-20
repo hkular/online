@@ -4,9 +4,7 @@
  * @author Tim Brady, Janna Wennberg
  * Original code by Tim Brady Dec. 2020, 
  * adapted for jsPsych 7.2 and retrocue added by Janna Wennberg, June 2022
- * adapted by Holly Kular 6/2023 for orientation wm continuous report with distractors
-
-*/
+  */
 
 
 var css_added = false;
@@ -14,21 +12,21 @@ var css_added = false;
 var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
 
     const info = {
-        name: 'sequential-conjunction', /* will probably rename */
+        name: 'sequential-conjunction',
         parameters: {
-            /*display_set_size: {
+            display_set_size: {
                 type: jsPsych.ParameterType.INT,
                 pretty_name: 'Display set size',
                 default: 2,
                 description: 'Number of items to show on this trial'
-            }, will probably not need because set size 1*/
-            /*memory_set_size: {
+            },
+            memory_set_size: {
                 type: jsPsych.ParameterType.INT,
                 pretty_name: 'Memory set size',
                 default: 2,
                 description: 'Number of items to retro-cue'
-            }, only doing set size 1*/
-            /*feature_cue: {
+            },
+            feature_cue: {
                 type: jsPsych.ParameterType.INT,
                 pretty_name: 'Feature to cue',
                 default: 3,
@@ -45,8 +43,8 @@ var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
                 pretty_name: 'Recall features on separate objects?',
                 default: true,
                 description: 'Recall features on separate objects (only for feature_cue == 3)'
-            }, not doing a retrocue or any other features besides 1 ori*/
-            target_angles: {
+            },
+            item_angles: {
                 type: jsPsych.ParameterType.INT,
                 pretty_name: 'Actual oris to show (optional)',
                 default: [],
@@ -65,7 +63,7 @@ var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
                 pretty_name: 'Positions of items (optional)',
                 default: [],
                 array: true,
-                description: 'If not empty, should be where, from 0 to placeholders-1, each item from target_angles goes. '
+                description: 'If not empty, should be where, from 0 to placeholders-1, each item from item_angles goes. '
             },
             probe_position: {
                 type: jsPsych.ParameterType.INT,
@@ -248,10 +246,10 @@ var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
             /* Show the items:
             -------------------------------- */
             var item_colors = trial.item_colors;
-            var target_angles = trial.target_angles;
+            var item_angles = trial.item_angles;
 
-            if (trial.target_angles.length == 0 && trial.item_colors.length == 0) {
-                target_angles = GetOrisForTrial(trial.set_size, trial.min_difference);
+            if (trial.item_angles.length == 0 && trial.item_colors.length == 0) {
+                item_angles = GetOrisForTrial(trial.set_size, trial.min_difference);
                 item_colors = GetColorsForTrial(trial.set_size, trial.min_difference);
             }
 
@@ -261,7 +259,7 @@ var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
             function showFirstItem(ts) {
                 if (trial.display_time > 0) {
                     SetColor('ori', item_colors[0]);
-                    document.getElementById('ori').style.transform = 'rotate(' + -1 * target_angles[0] + 'deg)';
+                    document.getElementById('ori').style.transform = 'rotate(' + -1 * item_angles[0] + 'deg)';
                 }
                 start_request_anim = ts;
                 last_frame_time = ts;
@@ -302,7 +300,7 @@ var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
             function showSecondItem(ts) {
                 if (trial.display_time > 0) {
                     SetColor('ori', item_colors[1]);
-                    document.getElementById('ori').style.transform = 'rotate(' + -1 * target_angles[1] + 'deg)';
+                    document.getElementById('ori').style.transform = 'rotate(' + -1 * item_angles[1] + 'deg)';
                 }
                 start_request_anim = ts;
                 last_frame_time = ts;
@@ -404,7 +402,7 @@ var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
             
             var probe_angle = new Array();
             if (trial.feature_recall == 1){
-                probe_angle.push(target_angles[trial.probe_position-1]);
+                probe_angle.push(item_angles[trial.probe_position-1]);
             }else{
                 probe_angle.push(item_colors[trial.probe_position-1]);
             }
@@ -551,7 +549,7 @@ var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
                 var trial_data = {
                     "rt": end_click_times,
                     "probe_position": trial.probe_position,
-                    "target_angles": target_angles,
+                    "item_angles": item_angles,
                     "item_colors": item_colors,
                     "probe_angle": probe_angle,
                     "reported_angle": angle_clicked,

@@ -68,35 +68,58 @@
         
         WM_noiseV10_timeline.push({
             type: jsPsychInstructions,
-            pages: ['First, we will do some practice trials. Click NEXT to proceed.'],
+            pages: ['First, we will do some practice trials with blank delay periods. Click NEXT to proceed.'],
             show_clickable_nav: true
         })
 
-        var ori_practice = {
+        var ori_practice_blank = {
             timeline: [
                 {
-                    type: jsPsychContinuousConjunctionRetrocue,
+                    type: jsPsychContinuousOriReport,
                     data: {is_practice: "yes"},
-                    wheel_spin: false,
-                    set_size: 1,
-                    memory_set_size: 1,
-                    feature_cue: 1,
-                    feature_recall: 1,
-                    feature_separate_objects: false,
-                    probe_position: jsPsych.timelineVariable('probe_position'),
-                    num_placeholders: 2,
+                    target_kappa: jsPsych.timelineVariable('kappa'),
+                    distractor_cond: jsPsych.timelineVariable('distractor'),
                     feedback: true,
                 }
             ],
             timeline_variables: [
-                {probe_position: "Left"},
-                {probe_position: "Right"}
+                {kappa: 1, distractor: 1}, 
+                {kappa: 2, distractor: 1}, 
+                {kappa: 3, distractor: 1}, 
             ],
-            randomize_order: true,
-            repetitions: 12,
+            randomize_order: false,
+            repetitions: 2,
         }
         
-        WM_noiseV10_timeline.push(ori_practice);
+        WM_noiseV10_timeline.push(ori_practice_blank);
+
+
+        WM_noiseV10_timeline.push({
+            type: jsPsychInstructions,
+            pages: ['Next, we will do some practice trials with delay periods containing a rectangle that sometimes wiggles. Remember to report both the orientation and the wiggle. Click NEXT to proceed.'],
+            show_clickable_nav: true
+        })
+
+        var ori_practice_wiggle = {
+            timeline: [
+                {
+                    type: jsPsychContinuousOriReport,
+                    data: {is_practice: "yes"},
+                    target_kappa: jsPsych.timelineVariable('kappa'),
+                    distractor_cond: jsPsych.timelineVariable('distractor'),
+                    feedback: true,
+                }
+            ],
+            timeline_variables: [
+                {kappa: 1, distractor: 2}, {kappa: 1, distractor: 3},
+                {kappa: 2, distractor: 2}, {kappa: 2, distractor: 3},
+                {kappa: 3, distractor: 2}, {kappa: 3, distractor: 3}
+            ],
+            randomize_order: false,
+            repetitions: 1,
+        }
+        
+        WM_noiseV10_timeline.push(ori_practice_wiggle);
         
 
         WM_noiseV10_timeline.push({
@@ -115,48 +138,29 @@
         var trials = {
             timeline: [
                 {
-                    type: jsPsychContinuousConjunctionRetrocue,
+                    type: jsPsychContinuousOriReport,
                     data: {is_practice: "no"},
-                    wheel_spin: false,
-                    set_size: 2,
-                    memory_set_size: jsPsych.timelineVariable('memory_set_size'),
-                    feature_cue: jsPsych.timelineVariable('feature_cue'),
-                    feature_recall: jsPsych.timelineVariable('feature_recall'),
-                    feature_separate_objects: jsPsych.timelineVariable('feature_separate_objects'),
-                    probe_position: jsPsych.timelineVariable('probe_position'),
-                    num_placeholders: 2,
-                    feedback: true,
+                    target_kappa: jsPsych.timelineVariable('kappa'),
+                    distractor_cond: jsPsych.timelineVariable('distractor'),
+                    num_placeholders: 1,
+                    feedback: false,
                     on_finish: updateCounter
                 }
             ],
-            timeline_variables: [
-                {memory_set_size: 1, feature_cue: 1, feature_separate_objects: false, feature_recall: 1, probe_position: "Left"},
-                {memory_set_size: 1, feature_cue: 1, feature_separate_objects: false, feature_recall: 1, probe_position: "Right"},
-
-                {memory_set_size: 1, feature_cue: 2, feature_separate_objects: false, feature_recall: 2, probe_position: "Left"},
-                {memory_set_size: 1, feature_cue: 2, feature_separate_objects: false, feature_recall: 2, probe_position: "Right"},
-
-                {memory_set_size: 1, feature_cue: 3, feature_separate_objects: false, feature_recall: 1, probe_position: "Left"},
-                {memory_set_size: 1, feature_cue: 3, feature_separate_objects: false, feature_recall: 1, probe_position: "Right"},
-
-                {memory_set_size: 1, feature_cue: 3, feature_separate_objects: false, feature_recall: 2, probe_position: "Left"},
-                {memory_set_size: 1, feature_cue: 3, feature_separate_objects: false, feature_recall: 2, probe_position: "Right"},
-
-                {memory_set_size: 2, feature_cue: 3, feature_separate_objects: true, feature_recall: 1, probe_position: "Left"}, 
-                {memory_set_size: 2, feature_cue: 3, feature_separate_objects: true, feature_recall: 1, probe_position: "Right"}, 
-
-                {memory_set_size: 2, feature_cue: 3, feature_separate_objects: true, feature_recall: 2, probe_position: "Left"}, 
-                {memory_set_size: 2, feature_cue: 3, feature_separate_objects: true, feature_recall: 2, probe_position: "Right"}, 
+            timeline_variables: [ /* counterbalanced conds 3 kapp (1 low, 2 medium, 3 high) by 3 distractor (1 absent, 2 present, 3 change) */
+                {kappa: 1, distractor: 1}, {kappa: 1, distractor: 2}, {kappa: 1, distractor: 3},
+                {kappa: 2, distractor: 1}, {kappa: 2, distractor: 2}, {kappa: 2, distractor: 3},
+                {kappa: 3, distractor: 1}, {kappa: 3, distractor: 2}, {kappa: 3, distractor: 3}
 
             ],
             randomize_order: true,
-            repetitions: num_trials/12,
+            repetitions: num_trials/9, /* this is divided by num of counterbalanced conds*/
         }
 
-        berkeley_timeline.push(trials);
+        WM_noiseV10_timeline.push(trials);
         
         
-        berkeley_timeline.push({
+        WM_noiseV10_timeline.push({
             type: jsPsychSurveyText,
             preamble: "Thank you! You're just about done. If you would, please tell us about yourself:",
             questions: [
@@ -169,7 +173,7 @@
         });
 
         
-        berkeley_timeline.push({
+        WM_noiseV10_timeline.push({
             type: jsPsychInstructions,
             pages: ['<p>Thank you! You are all done. Press "Next" to be taken back to Prolific.</p>'],
             show_clickable_nav: true,
@@ -178,7 +182,7 @@
             },
         });
 
-        jsPsych.run(berkeley_timeline);
+        jsPsych.run(WM_noiseV10_timeline);
 
         // Send the data to the server as JSON: 
         
@@ -198,30 +202,27 @@
                 "surveyData": jsPsych.data.get().select('response'),
 
                 "rt": jsPsych.data.get().select('rt'),
-                "position_of_items": jsPsych.data.get().select('position_of_items'),
-                "probe_position": jsPsych.data.get().select('probe_position'),
-                "item_angles": jsPsych.data.get().select('item_angles'),
-                "item_colors": jsPsych.data.get().select('item_colors'),
+                "target_angles": jsPsych.data.get().select('target_angles'),
+                "distractor_angle": jsPsych.data.get().select('distractor_angle'),
                 "probe_angle": jsPsych.data.get().select('probe_angle'),
+                "distractor_report" : jsPsych.data.get().select('distractor_report'),
                 "reported_angle": jsPsych.data.get().select('reported_angle'),
                 "reported_angle_wrapped": jsPsych.data.get().select('reported_angle_wrapped'),
                 "trial_error": jsPsych.data.get().select('trial_error'),
-                "memory_set_size": jsPsych.data.get().select('memory_set_size'),
-                "feature_cue": jsPsych.data.get().select('feature_cue'),
-                "feature_recall": jsPsych.data.get().select('feature_recall'),
-                "feature_separate_objects": jsPsych.data.get().select('feature_separate_objects'),
+                "kappa": jsPsych.data.get().select('kappa'),
+                "distractor": jsPsych.data.get().select('distractor'),
                 "display_time": jsPsych.data.get().select('display_time'),
                 "actual_stim1_duration": jsPsych.data.get().select('actual_stim1_duration'),
                 "actual_stim2_duration": jsPsych.data.get().select('actual_stim2_duration'),
                 "isi_time": jsPsych.data.get().select('isi_time'),
-                "pre_retrocue_delay": jsPsych.data.get().select('pre_retrocue_delay'),
-                "retrocue_time": jsPsych.data.get().select('retrocue_time'),
-                "post_retrocue_delay": jsPsych.data.get().select('post_retrocue_delay'),
+                "pre_wiggle_delay": jsPsych.data.get().select('pre_retrocue_delay'),
+                "delay_time": jsPsych.data.get().select('retrocue_time'),
+                "post_wiggle_delay": jsPsych.data.get().select('post_retrocue_delay'),
             };
             var dataToServer = {
                 'id': subject_id,
-                'experimenter': 'Janna',
-                'experimentName': 'berkeley_v1',
+                'experimenter': 'Holly',
+                'experimentName': 'WM_noiseV10',
                 'curData': JSON.stringify(expt_data)
             };
             $.post("https://bradylab.ucsd.edu/turk/save.php", dataToServer)
