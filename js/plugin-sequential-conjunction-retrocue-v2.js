@@ -53,7 +53,19 @@ var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
                 array: true,
                 description: 'If not empty, should be a list of oris to show, in degrees, of same length as set_size. If empty, random oris with min distance between them of min_difference [option below] will be chosen. '
             },
-            item_colors: {
+            target_kappa: {
+                type: jsPsych.ParameterType.INT,
+                pretty_name: 'Actual kappa to show (necessary)',
+                default: [],
+                description: 'If not empty, should select kappa for image for target presentation. '
+            },
+            distractor_cond: {
+                type: jsPsych.ParameterType.INT,
+                pretty_name: 'Actual distractor condition to show (necessary)',
+                default: [],
+                description: 'If not empty, should select image for delay presentation. '
+            },
+            /*item_colors: {
                 type: jsPsych.ParameterType.INT,
                 pretty_name: 'Actual colors to show (optional)',
                 default: [],
@@ -73,7 +85,7 @@ var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
                 default: 0,
                 array: true,
                 description: 'Which item (1 = first, 2 = second) item(s) are cued. '
-            },
+            },*/
             click_to_start: {
                 type: jsPsych.ParameterType.BOOL,
                 pretty_name: 'Click to start trial or start on a timer?',
@@ -90,27 +102,27 @@ var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
                 type: jsPsych.ParameterType.BOOL,
                 pretty_name: 'Give feedback?',
                 default: true,
-                description: 'Feedback will be in deg. of color wheel of error.'
+                description: 'Feedback will be in deg. of error.'
             },
             item_size: {
                 type: jsPsych.ParameterType.INT,
                 pretty_name: 'Size of each item',
-                default: 180,
+                default: 180, /* maybe change this */
                 description: 'Diameter of each circle in pixels.'
             },
             display_time: {
                 type: jsPsych.ParameterType.INT,
                 pretty_name: 'Time to show oris',
-                default: 750,
+                default: 750, /* maybe change this */
                 description: 'Time in ms. to display oris'
             },
             isi_time: {
                 type: jsPsych.ParameterType.INT,
                 pretty_name: 'Inter-stimulus interval',
-                default: 500,
-                description: 'Time in ms. between first and second stimulus'
+                default: 500, /* maybe change this */
+                description: 'Time in ms. between target and delay stim'
             },
-            pre_retrocue_time: {
+            /*pre_retrocue_time: {
                 type: jsPsych.ParameterType.INT,
                 pretty_name: 'Time until retrocue',
                 default: 500,
@@ -127,6 +139,30 @@ var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
                 pretty_name: 'Time until probe',
                 default: 1000,
                 description: 'Time in ms between offset of retrocue and probe'
+            },*/
+            pre_wiggle_time: {
+                type: jsPsych.ParameterType.INT,
+                pretty_name: 'Time until wiggle',
+                default: 500,
+                description: 'Time in ms between offset of target and delay wiggle'
+            },
+            delay_time: {
+                type: jsPsych.ParameterType.INT,
+                pretty_name: 'Time length of delay',
+                default: 500,
+                description: 'Time in ms between offset of target and response'
+            },
+            post_wiggle_time: {
+                type: jsPsych.ParameterType.INT,
+                pretty_name: 'Time until response',
+                default: 500,
+                description: 'Time in ms between offset of delay wiggle and response'
+            },
+            response_time: {
+                type: jsPsych.ParameterType.INT,
+                pretty_name: 'Time of response',
+                default: 500,
+                description: 'Time in ms between offset of delay and iti'
             },
             radius: {
                 type: jsPsych.ParameterType.INT,
@@ -134,12 +170,12 @@ var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
                 default: 160,
                 description: 'Radius in pixels of circle items appear along.'
             },
-            num_placeholders: {
+            /*num_placeholders: {
                 type: jsPsych.ParameterType.INT,
                 pretty_name: 'Number of locations where items can appear',
                 default: 2,
                 description: 'Number of locations where items can appear'
-            },
+            },*/
             min_difference: {
                 type: jsPsych.ParameterType.INT,
                 pretty_name: 'Min difference between different items',
@@ -149,7 +185,7 @@ var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
             bg_color: {
                 type: jsPsych.ParameterType.STRING,
                 pretty_name: 'BG color of box for experiment',
-                default: '#DDDDDD',
+                default: '#848484', /* should match BG of targets */
                 description: 'BG color of box for experiment.'
             }
         }
