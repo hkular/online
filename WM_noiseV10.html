@@ -11,7 +11,7 @@
         src="https://bradylab.ucsd.edu/turk/experiments/Holly/jspsych/dist/plugin-html-button-response.js"></script>
     <script src="https://bradylab.ucsd.edu/turk/experiments/Holly/jspsych/dist/plugin-survey-text.js"></script>
     <script
-        src="https://bradylab.ucsd.edu/turk/experiments/Holly/jspsych/dist/homemade/plugin-continuous-ori-report.js"></script>  !! write this !!
+        src="https://bradylab.ucsd.edu/turk/experiments/Holly/jspsych/dist/homemade/plugin-sequential-continuous-report.js"></script>  !! write this !!
     <link rel="stylesheet" href="https://bradylab.ucsd.edu/turk/experiments/Holly/jspsych/dist/jspsych.css">
 </head>
 
@@ -57,7 +57,7 @@
         WM_noiseV10_timeline.push({
             type: jsPsychInstructions,
             pages: ['<p>Welcome to the experiment!</p>',
-                '<p>In this experiment, you will have to remember some briefly presented  oriented stimuli. You will need to do '+num_trials+' trials, each of which takes about 4-6 seconds. It should take less than 60 minutes total. <strong>Please do not participate if you do not have normal or corrected-to-normal vision.</strong> It is OK if you do both this study and other similar Prolific studies that require orientation or shape memory. <p>On each trial, you will see a center dot. Your first job is try to always look at the center dot and pay attention to anything else without moving your eyes off the center dot. <p align="center"><img src="berkeley_screenshots/click_to_start.png" width="400" border=0></p> When you click to start the trial, these center dot will be surrounded by a donut with an oriented pattern in it. The donut will be presented only very briefly &mdash; shown for under one second &mdash; so be sure not to click to start the trial until you are ready. <strong>Your job is to remember the orientation of the pattern in the donut the best you can. The fuzziness of the orientation will vary, sometimes it will be clearer and sometimes it will be harder to see the orientation.</strong> </p><p align="center"><img src="berkeley_screenshots/example_stim6.png" width="400" border=0></p> <p>We are interested in your <b>VISUAL</b> memory. So it is important that you do not say descriptive words to yourself (e.g., "horizontal line") or use words to perform the task. If you find yourself struggling not to do this, we suggest you repeat the word "the" over and over in your head when the items are presented. This will help you to remember not to use words to remember the angles.</p>',
+                '<p>In this experiment, you will have to remember some briefly presented oriented stimuli. You will need to do '+num_trials+' trials, each of which takes about 4-6 seconds. It should take less than 60 minutes total. <strong>Please do not participate if you do not have normal or corrected-to-normal vision.</strong> It is OK if you do both this study and other similar Prolific studies that require orientation or shape memory. <p>On each trial, you will see a center dot. Your first job is try to always look at the center dot and pay attention to anything else without moving your eyes off the center dot. <p align="center"><img src="berkeley_screenshots/click_to_start.png" width="400" border=0></p> When you click to start the trial, these center dot will be surrounded by a donut with an oriented pattern in it. The donut will be presented only very briefly &mdash; shown for under one second &mdash; so be sure not to click to start the trial until you are ready. <strong>Your job is to remember the orientation of the pattern in the donut the best you can. The fuzziness of the orientation will vary, sometimes it will be clearer and sometimes it will be harder to see the orientation.</strong> </p><p align="center"><img src="berkeley_screenshots/example_stim6.png" width="400" border=0></p> <p>We are interested in your <b>VISUAL</b> memory. So it is important that you do not say descriptive words to yourself (e.g., "horizontal line") or use words to perform the task. If you find yourself struggling not to do this, we suggest you repeat the word "the" over and over in your head when the items are presented. This will help you to remember not to use words to remember the angles.</p>',
 
                 '<p> Following the presentation of the orientation donut, there will be a "delay" period, during which you will need to remember the orientation. During this delay period, sometimes you will see nothing and sometimes you will see an oriented rectangle. And sometimes you will see the oriented rectangle briefly wiggle.  <p align="center"><img src="berkeley_screenshots/cue_right_color.png" width="400" border=0></p> <p> When you see the rectangle wiggle, like the example above, your job is to report whether you saw it wiggle clockwise or counterclockwise from its main position. In the example above, the correct answer is clockwise.  <p align="center"><img src="berkeley_screenshots/cue_left_ori_left_color.png" width="400" border=0></p> <p>You will report the clockwise and counterclockwise wiggle by pressing the arrow keys on the keyboard. </p> <p align="center"><img src="berkeley_screenshots/cue_left_ori_right_color.png" width="400" border=0></p> <p>After the delay period with or without a rectangle is over, you will be almost immediately tested on your memory of the oriented donut. You will see a line the screen, which you will rotate using the arrow keys on the keyboard to match the orientation you remember. </p> <p align="center"><img src="berkeley_screenshots/example_stim2.png" width="400" border=0><img src="berkeley_screenshots/example_ori_report.png" width="400" border=0></p>',
 
@@ -75,7 +75,7 @@
         var ori_practice_blank = {
             timeline: [
                 {
-                    type: jsPsychContinuousOriReport,
+                    type: jsPsychSequentialContinuousReport,
                     data: {is_practice: "yes"},
                     set_size:1,
                     target_kappa: jsPsych.timelineVariable('kappa'),
@@ -104,7 +104,7 @@
         var ori_practice_wiggle = {
             timeline: [
                 {
-                    type: jsPsychContinuousOriReport,
+                    type: jsPsychSequentialContinuousReport,
                     data: {is_practice: "yes"},
                     set_size:1,
                     target_kappa: jsPsych.timelineVariable('kappa'),
@@ -140,7 +140,7 @@
         var trials = {
             timeline: [
                 {
-                    type: jsPsychContinuousOriReport,
+                    type: jsPsychSequentialContinuousReport,
                     data: {is_practice: "no"},
                     set_size: 1,
                     target_kappa: jsPsych.timelineVariable('kappa'),
@@ -203,7 +203,6 @@
                 "interactionData": jsPsych.data.getInteractionData().json(),
                 "fullData": jsPsych.data.get().json(),
                 "surveyData": jsPsych.data.get().select('response'),
-
                 "rt": jsPsych.data.get().select('rt'),
                 "target_angles": jsPsych.data.get().select('target_angles'),
                 "distractor_angle": jsPsych.data.get().select('distractor_angle'),
@@ -215,8 +214,8 @@
                 "kappa": jsPsych.data.get().select('kappa'),
                 "distractor": jsPsych.data.get().select('distractor'),
                 "display_time": jsPsych.data.get().select('display_time'),
-                "actual_stim1_duration": jsPsych.data.get().select('actual_stim1_duration'),
-                "actual_stim2_duration": jsPsych.data.get().select('actual_stim2_duration'),
+                "actual_target_duration": jsPsych.data.get().select('actual_target_duration'),
+                "actual_delay_duration": jsPsych.data.get().select('actual_delay_duration'),
                 "isi_time": jsPsych.data.get().select('isi_time'),
                 "pre_wiggle_delay": jsPsych.data.get().select('pre_retrocue_delay'),
                 "delay_time": jsPsych.data.get().select('retrocue_time'),
