@@ -284,43 +284,44 @@ var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
             /* Show the items:
             -------------------------------- */
             var item_colors = trial.item_colors;
-            var target_angles = trial.target_angles;
+            /*var item_angles = trial.item_angles;*/
 
-            if (trial.target_angles.length == 0 && trial.item_colors.length == 0) {
-                target_angles = GetOrisForTrial(trial.set_size, trial.min_difference);
-                item_colors = GetColorsForTrial(trial.set_size, trial.min_difference);
+            if (trial.item_angles.length == 0 /* && trial.item_colors.length == 0*/) {
+                item_angles = GetOrisForTrial(trial.set_size, trial.min_difference);
+                /*item_colors = GetColorsForTrial(trial.set_size, trial.min_difference);*/
             }
+
 
             var start_request_anim;
             var last_frame_time;
 
-            function showFirstItem(ts) {
+            function showTarget(ts) {
                 if (trial.display_time > 0) {
-                    SetColor('ori', item_colors[0]);
+                    /*SetColor('ori', item_colors[0]);*/
                     document.getElementById('ori').style.transform = 'rotate(' + -1 * target_angles[0] + 'deg)';
                 }
                 start_request_anim = ts;
                 last_frame_time = ts;
-                hideFirstItem(ts);
+                hideTarget(ts);
             };
 
             /* Wait until time to hide stimuli:
         -------------------------------- */
-            var actual_stim1_duration;
-            var actual_stim2_duration;
+            var actual_targ_duration;
+            var actual_dist_duration;
 
-            var hideFirstItem = function (ts) {
+            var hideTarget = function (ts) {
                 var last_frame_duration = ts - last_frame_time;
                 last_frame_time = ts;
                 if (ts - start_request_anim
                     >= trial.display_time - (last_frame_duration / 2)) {
-                    actual_stim1_duration = ts - start_request_anim;
+                    actual_targ_duration = ts - start_request_anim;
                     for (var i = 0; i < trial.set_size; i++) {
                         document.getElementById('ori').style.backgroundColor = '';
                     }
                     requestAnimationFrame(interstimulusInterval);
                 } else {
-                    requestAnimationFrame(hideFirstItem);
+                    requestAnimationFrame(hideTarget);
                 }
             }
 
@@ -329,34 +330,34 @@ var jsPsychSequentialConjunctionRetrocue = (function (jsPsych) {
                 last_frame_time = ts;
                 if (ts - start_request_anim
                     >= trial.display_time + trial.isi_time - (last_frame_duration / 2)) {
-                    showSecondItem(performance.now());
+                    showDistractor(performance.now());
                 } else {
                     requestAnimationFrame(interstimulusInterval);
                 }               
             }
 
-            function showSecondItem(ts) {
+            function showDistractor(ts) {
                 if (trial.display_time > 0) {
-                    SetColor('ori', item_colors[1]);
+                    /*SetColor('ori', item_colors[1]);*/
                     document.getElementById('ori').style.transform = 'rotate(' + -1 * target_angles[1] + 'deg)';
                 }
                 start_request_anim = ts;
                 last_frame_time = ts;
-                hideSecondItem(ts);
+                hideDistractor(ts);
             };
 
-            var hideSecondItem = function (ts) {
+            var hideDistractor = function (ts) {
                 var last_frame_duration = ts - last_frame_time;
                 last_frame_time = ts;
                 if (ts - start_request_anim
                     >= trial.display_time - (last_frame_duration / 2)) {
-                    actual_stim2_duration = ts - start_request_anim;
+                    actual_dist_duration = ts - start_request_anim;
                     for (var i = 0; i < trial.set_size; i++) {
                         document.getElementById('ori').style.backgroundColor = '';
                     }
                     requestAnimationFrame(delayUntilRetrocue);
                 } else {
-                    requestAnimationFrame(hideSecondItem);
+                    requestAnimationFrame(hideDistractor);
                 }
             }
 
