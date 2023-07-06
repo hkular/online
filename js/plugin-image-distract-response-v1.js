@@ -178,7 +178,30 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                         ctx.drawImage(img, 0, 0, width, height);
                     }
                 };
-                img.src = trial.stimulus;
+
+                //preload images for each trial
+                // old code img.src = trial.stimulus;
+                // load targets phase 1 and 2 randomly from 1 through 500
+                var targets = [];
+                var minNumber = 1;
+                var maxNumber = 500;
+               //!!!! start back here for (var i = 0; i < numberOfDistractors; i++){var randomTarget = Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
+                    var Target1Path = 'images/targets/Target_k' + trial.target_kappa + 'p1n' + randomTarget + '.png';
+                    var Target2Path = 'images/targets/Target_k' + trial.target_kappa + 'p2n' + randomTarget + '.png';
+                    distractors.push(distractorPath);}
+
+                var target1 = ['images/targets/Target_k50p1n1.png']; var target2 = ['images/targets/Target_k50p2n1.png'];
+                
+                // load distractors 10 randomly from 1 through 500
+                var distractors = [];
+                var numberOfDistractors = 10;
+                for (var i = 0; i < numberOfDistractors; i++) {
+                    var randomDistractor = Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
+                    var distractorPath = 'images/distractors/distractor_n' + randomDistractor + '.png';
+                    distractors.push(distractorPath);
+                }
+
+                img.src = target1; // for now just target1
                 // get/set image height and width - this can only be done after image loads because uses image's naturalWidth/naturalHeight properties
                 const getHeightWidth = () => {
                     if (trial.stimulus_height !== null) {
