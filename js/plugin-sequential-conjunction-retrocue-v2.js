@@ -16,6 +16,51 @@ var jsPsychSequentialContinuousReport = (function (jsPsych) {
     const info = {
         name: 'sequential-continuous', /* will probably rename */
         parameters: {
+            /** The image to be displayed */
+          stimulus: {
+              type: jspsych.ParameterType.IMAGE,
+              pretty_name: "Stimulus",
+              default: undefined,
+          },
+          /** Set the image height in pixels */
+          stimulus_height: {
+              type: jspsych.ParameterType.INT,
+              pretty_name: "Image height",
+              default: null,
+          },
+          /** Set the image width in pixels */
+          stimulus_width: {
+              type: jspsych.ParameterType.INT,
+              pretty_name: "Image width",
+              default: null,
+          },
+          /** Maintain the aspect ratio after setting width or height */
+          maintain_aspect_ratio: {
+              type: jspsych.ParameterType.BOOL,
+              pretty_name: "Maintain aspect ratio",
+              default: true,
+          },
+          /** Array containing the key(s) the subject is allowed to press to respond to the stimulus. */
+          choices: {
+              type: jspsych.ParameterType.KEYS,
+              pretty_name: "Choices",
+              default: "ALL_KEYS",
+          },
+          /** If true, trial will end when subject makes a response. */
+          response_ends_trial: {
+            type: jspsych.ParameterType.BOOL,
+            pretty_name: "Response ends trial",
+            default: true,
+        },
+        /**
+         * If true, the image will be drawn onto a canvas element (prevents blank screen between consecutive images in some browsers).
+         * If false, the image will be shown via an img element.
+         */
+        render_on_canvas: {
+            type: jspsych.ParameterType.BOOL,
+            pretty_name: "Render on canvas",
+            default: true,
+        },
             /*display_set_size: {
                 type: jsPsych.ParameterType.INT,
                 pretty_name: 'Display set size',
