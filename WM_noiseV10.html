@@ -82,18 +82,17 @@
         var ori_practice_blank = {
             timeline: [
                 {
-                    type: jsPsychSequentialContinuousReport,
+                    type: jsPsychImageDistractResponse,
                     data: {is_practice: "yes"},
-                    set_size:1,
-                    target_kappa: jsPsych.timelineVariable('kappa'),
-                    distractor_cond: jsPsych.timelineVariable('distractor'),
+                    kappa: jsPsych.timelineVariable('kappa'),
+                    distractor: jsPsych.timelineVariable('distractor'),
                     feedback: true,
                 }
             ],
             timeline_variables: [
-                {kappa: 1, distractor: 1}, 
-                {kappa: 2, distractor: 1}, 
-                {kappa: 3, distractor: 1}, 
+                {kappa: 50, distractor: 1}, 
+                {kappa: 100, distractor: 1}, 
+                {kappa: 5000, distractor: 1}, 
             ],
             randomize_order: false,
             repetitions: 2,
@@ -111,18 +110,17 @@
         var ori_practice_wiggle = {
             timeline: [
                 {
-                    type: jsPsychSequentialContinuousReport,
+                    type: jsPsychImageDistractResponse,
                     data: {is_practice: "yes"},
-                    set_size:1,
-                    target_kappa: jsPsych.timelineVariable('kappa'),
-                    distractor_cond: jsPsych.timelineVariable('distractor'),
+                    kappa: jsPsych.timelineVariable('kappa'),
+                    distractor: jsPsych.timelineVariable('distractor'),
                     feedback: true,
                 }
             ],
             timeline_variables: [
-                {kappa: 1, distractor: 2}, {kappa: 1, distractor: 3},
-                {kappa: 2, distractor: 2}, {kappa: 2, distractor: 3},
-                {kappa: 3, distractor: 2}, {kappa: 3, distractor: 3}
+                {kappa: 50, distractor: 2}, {kappa: 50, distractor: 3},
+                {kappa: 100, distractor: 2}, {kappa: 100, distractor: 3},
+                {kappa: 5000, distractor: 2}, {kappa: 5000, distractor: 3}
             ],
             randomize_order: false,
             repetitions: 1,
@@ -147,20 +145,18 @@
         var trials = {
             timeline: [
                 {
-                    type: jsPsychSequentialContinuousReport,
+                    type: jsPsychImageDistractResponse,
                     data: {is_practice: "no"},
-                    set_size: 1,
-                    target_kappa: jsPsych.timelineVariable('kappa'),
-                    distractor_cond: jsPsych.timelineVariable('distractor'),
-                    num_placeholders: 1,
+                    kappa: jsPsych.timelineVariable('kappa'),
+                    distractor: jsPsych.timelineVariable('distractor'),
                     feedback: false,
                     on_finish: updateCounter
                 }
             ],
             timeline_variables: [ /* counterbalanced conds 3 kapp (1 low, 2 medium, 3 high) by 3 distractor (1 absent, 2 present, 3 change) */
-                {kappa: 1, distractor: 1}, {kappa: 1, distractor: 2}, {kappa: 1, distractor: 3},
-                {kappa: 2, distractor: 1}, {kappa: 2, distractor: 2}, {kappa: 2, distractor: 3},
-                {kappa: 3, distractor: 1}, {kappa: 3, distractor: 2}, {kappa: 3, distractor: 3}
+                {kappa: 50, distractor: 1}, {kappa: 50, distractor: 2}, {kappa: 50, distractor: 3},
+                {kappa: 100, distractor: 1}, {kappa: 100, distractor: 2}, {kappa: 100, distractor: 3},
+                {kappa: 5000, distractor: 1}, {kappa: 5000, distractor: 2}, {kappa: 5000, distractor: 3}
 
             ],
             randomize_order: true,

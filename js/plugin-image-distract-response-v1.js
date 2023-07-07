@@ -1,6 +1,6 @@
 var jsPsychImageDistractResponse = (function (jspsych) {
     'use strict';
-  
+
     const info = {
         name: "image-keyboard-response",
         parameters: {
@@ -28,6 +28,24 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                 pretty_name: "Maintain aspect ratio",
                 default: true,
             },
+            /** Duration to display each image. */
+            frame_time: {
+                type: jspsych.ParameterType.INT,
+                pretty_name: "Frame time",
+                default: 250,
+            },
+            /** Length of gap to be shown between each image. */
+            frame_isi: {
+                type: jspsych.ParameterType.INT,
+                pretty_name: "Frame gap",
+                default: 0,
+            },
+             /** Number of times to show entire sequence */
+            sequence_reps: {
+            type: jspsych.ParameterType.INT,
+            pretty_name: "Sequence repetitions",
+            default: 1,
+             },
             /** Array containing the key(s) the subject is allowed to press to respond to the stimulus. */
             choices: {
                 type: jspsych.ParameterType.KEYS,
@@ -154,6 +172,13 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                 css_added = true;
             }
 
+            var interval_time = trial.frame_time + trial.frame_isi;
+            var animate_frame = 0;
+            var reps = 0;
+            var startTime = performance.now();
+            var animation_sequence = [];
+            var responses = [];
+            var current_stim = "";
             var height, width;
             if (trial.render_on_canvas) {
                 var image_drawn = false;
@@ -166,9 +191,11 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                 }
                 // create canvas element and image
                 var canvas = document.createElement("canvas");
-                canvas.id = "jspsych-image-keyboard-response-stimulus";
+                canvas.id = "jspsych-animation-image";
                 canvas.style.margin = "0";
                 canvas.style.padding = "0";
+                canvas.style.cursor = 'none'; //maybe ?? could annoy people
+                display_element.insertBefore(canvas, null); //maybe ??
                 var ctx = canvas.getContext("2d");
                 var img = new Image();
                 img.onload = () => {
@@ -183,25 +210,26 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                 // old code img.src = trial.stimulus;
                 // load targets phase 1 and 2 randomly from 1 through 500
                 var targets = [];
+                var numberOfTargets = 2;
                 var minNumber = 1;
                 var maxNumber = 500;
-               //!!!! start back here for (var i = 0; i < numberOfDistractors; i++){var randomTarget = Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
-                    var Target1Path = 'images/targets/Target_k' + trial.target_kappa + 'p1n' + randomTarget + '.png';
-                    var Target2Path = 'images/targets/Target_k' + trial.target_kappa + 'p2n' + randomTarget + '.png';
-                    distractors.push(distractorPath);}
-
-                var target1 = ['images/targets/Target_k50p1n1.png']; var target2 = ['images/targets/Target_k50p2n1.png'];
-                
+                for (var i = 0; i < numberOfTargets; i++) {
+                    var randomTarget = Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
+                    var Target1Path = 'images/targets/Target_k' + trial.kappa + 'p1n' + randomTarget + '.png';
+                    var Target2Path = 'images/targets/Target_k' + trial.kappa + 'p2n' + randomTarget + '.png';
+                    targets.push(Target1Path, Target2Path);
+                }
                 // load distractors 10 randomly from 1 through 500
                 var distractors = [];
                 var numberOfDistractors = 10;
-                for (var i = 0; i < numberOfDistractors; i++) {
-                    var randomDistractor = Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
-                    var distractorPath = 'images/distractors/distractor_n' + randomDistractor + '.png';
-                    distractors.push(distractorPath);
+                if (trial.distractor === 2 || trial.distractor === 3) {
+                    for (var i = 0; i < numberOfDistractors; i++) {
+                        var randomDistractor = Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
+                        var distractorPath = 'images/distractors/distractor_n' + randomDistractor + '.png';
+                        distractors.push(distractorPath);
+                    }
                 }
-
-                img.src = target1; // for now just target1
+                img.src = targets[0]; // for now just target1 -- maybe this needs to be a for loop to draw each one?
                 // get/set image height and width - this can only be done after image loads because uses image's naturalWidth/naturalHeight properties
                 const getHeightWidth = () => {
                     if (trial.stimulus_height !== null) {
@@ -240,10 +268,83 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                 if (trial.prompt !== null) {
                     display_element.insertAdjacentHTML("beforeend", trial.prompt);
                 }
+
+                const endTrial = () => {
+                    this.jsPsych.pluginAPI.cancelKeyboardResponse(response_listener);
+                    var trial_data = {
+                        animation_sequence: animation_sequence,
+                        response: responses,
+                    };
+                    this.jsPsych.finishTrial(trial_data);
+                }; 
+
+            
+                var animate_interval = setInterval(() => {
+                    var showImage = true;
+                    if (!trial.render_on_canvas) {
+                        display_element.innerHTML = ""; // clear everything
+                    }
+                    animate_frame++;
+                    if (animate_frame == stimulus.length) {
+                        animate_frame = 0;
+                        reps++;
+                        if (reps >= trial.sequence_reps) {
+                            endTrial();
+                            clearInterval(animate_interval);
+                            showImage = false;
+                        }
+                    }
+                    if (showImage) {
+                        show_next_frame();
+                    }
+                }, interval_time);
+
+                const show_next_frame = () => {
+                    if (trial.render_on_canvas) {
+                        display_element.querySelector("#jspsych-animation-image").style.visibility =
+                            "visible";
+                        var img = new Image();
+                        img.src = targets[animate_frame];
+                        //canvas.height = img.naturalHeight;
+                        //canvas.width = img.naturalWidth;
+                        ctx.drawImage(img, 0, 0);
+                        if (trial.prompt !== null && animate_frame == 0 && reps == 0) {
+                            display_element.insertAdjacentHTML("beforeend", trial.prompt);
+                        }
+                    }
+                    else {
+                        // show image
+                        display_element.innerHTML =
+                            '<img src="' + trial.stimuli[animate_frame] + '" id="jspsych-animation-image"></img>';
+                        if (trial.prompt !== null) {
+                            display_element.innerHTML += trial.prompt;
+                        }
+                    }
+                    current_stim = trial.stimuli[animate_frame];
+                    // record when image was shown
+                    animation_sequence.push({
+                        stimulus: trial.stimuli[animate_frame],
+                        time: Math.round(performance.now() - startTime),
+                    });
+                    if (trial.frame_isi > 0) {
+                        this.jsPsych.pluginAPI.setTimeout(() => {
+                            display_element.querySelector("#jspsych-animation-image").style.visibility =
+                                "hidden";
+                            current_stim = "blank";
+                            // record when blank image was shown
+                            animation_sequence.push({
+                                stimulus: "blank",
+                                time: Math.round(performance.now() - startTime),
+                            });
+                        }, trial.frame_time);
+                    }
+                };
+
             }
+            /* not using this because will be drawing as a canvas element only
             else {
                 // display stimulus as an image element
-                var html = '<img src="' + trial.stimulus + '" id="jspsych-image-keyboard-response-stimulus">';
+                var html = '<img src="' + trial.stimulus + '" id="jspsych-image-distract-response-stimulus">';
                 // add prompt
                 if (trial.prompt !== null) {
                     html += trial.prompt;
@@ -251,7 +352,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                 // update the page content
                 display_element.innerHTML = html;
                 // set image dimensions after image has loaded (so that we have access to naturalHeight/naturalWidth)
-                var img = display_element.querySelector("#jspsych-image-keyboard-response-stimulus");
+                var img = display_element.querySelector("#jspsych-image-distract-response-stimulus");
                 if (trial.stimulus_height !== null) {
                     height = trial.stimulus_height;
                     if (trial.stimulus_width == null && trial.maintain_aspect_ratio) {
@@ -274,7 +375,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                 }
                 img.style.height = height.toString() + "px";
                 img.style.width = width.toString() + "px";
-            }
+            }*/
             // store response
             var response = {
                 rt: null,
@@ -303,7 +404,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
             var after_response = (info) => {
                 // after a valid response, the stimulus will have the CSS class 'responded'
                 // which can be used to provide visual feedback that a response was recorded
-                display_element.querySelector("#jspsych-image-keyboard-response-stimulus").className +=
+                display_element.querySelector("#jspsych-image-distract-response-stimulus").className +=
                     " responded";
                 // only record the first response
                 if (response.key == null) {
@@ -326,7 +427,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
             // hide stimulus if stimulus_duration is set
             if (trial.stimulus_duration !== null) {
                 this.jsPsych.pluginAPI.setTimeout(() => {
-                    display_element.querySelector("#jspsych-image-keyboard-response-stimulus").style.visibility = "hidden";
+                    display_element.querySelector("#jspsych-image-distract-response-stimulus").style.visibility = "hidden";
                 }, trial.stimulus_duration);
             }
             // end trial if trial_duration is set
@@ -373,7 +474,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
         }
     }
     ImageDistractResponsePlugin.info = info;
-  
+
     return ImageDistractResponsePlugin;
-  
-  })(jsPsychModule);
+
+})(jsPsychModule);
