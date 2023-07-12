@@ -277,12 +277,12 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                         distractors.push(distractorPath);
                     }
                 }
-                else {
+                else { //if absent trial
                     for (var i = 0; i < numberOfDistractors; i++) {
                         var distractorPath = 'images/blank/blank.png';
                         distractors.push(distractorPath);}
                 }
-                // set stimuli based on time
+                // set stimuli based on time ??
                 stimuli = [];
                 if (interval_time < 500){
                     stimuli = targets;
@@ -366,8 +366,8 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                             "visible";
                         var img = new Image();
                         img.src = stimuli[animate_frame];
-                        //canvas.height = img.naturalHeight;
-                        //canvas.width = img.naturalWidth;
+                        canvas.height = img.naturalHeight;
+                        canvas.width = img.naturalWidth;
                         ctx.drawImage(img, 0, 0);
                         if (trial.prompt !== null && animate_frame == 0 && reps == 0) {
                             display_element.insertAdjacentHTML("beforeend", trial.prompt);
