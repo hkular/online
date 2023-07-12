@@ -20,13 +20,13 @@ var jsPsychImageDistractResponse = (function (jspsych) {
             stimulus_height: {
                 type: jspsych.ParameterType.INT,
                 pretty_name: "Image height",
-                default: null,
+                default: 520,
             },
             /** Set the image width in pixels */
             stimulus_width: {
                 type: jspsych.ParameterType.INT,
                 pretty_name: "Image width",
-                default: null,
+                default: 520,
             },
             /** Maintain the aspect ratio after setting width or height */
             maintain_aspect_ratio: {
@@ -285,8 +285,11 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                     var Target2Path = 'images/targets/Target_k' + trial.kappa + 'p2n' + randomTarget + '.png';
                     targets.push(Target1Path, Target2Path);
                 }
-
-                img.src = targets[0]; // just use target to calculate size
+                // !!! pick up here
+                if (ts <= target_duration){
+                    img.src = targets[animate_frame];} // just use target to calculate size
+                else if (ts >= target_duration && ts <= ){
+                    img.src = distractors[animate_frame];}
                 // get/set image height and width - this can only be done after image loads because uses image's naturalWidth/naturalHeight properties
                 const getHeightWidth = () => {
                     if (trial.stimulus_height !== null) {
