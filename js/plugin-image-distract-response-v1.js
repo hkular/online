@@ -4,10 +4,16 @@ var jsPsychImageDistractResponse = (function (jspsych) {
     const info = {
         name: "image-keyboard-response",
         parameters: {
-            /** The image to be displayed */
-            stimulus: {
+            /** The target image to be displayed */
+            target: {
                 type: jspsych.ParameterType.IMAGE,
-                pretty_name: "Stimulus",
+                pretty_name: "Target",
+                default: undefined,
+            },
+             /** The distractor image to be displayed */
+             distractor: {
+                type: jspsych.ParameterType.IMAGE,
+                pretty_name: "Distractor",
                 default: undefined,
             },
             /** Set the image height in pixels */
@@ -28,17 +34,29 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                 pretty_name: "Maintain aspect ratio",
                 default: true,
             },
-            /** Duration to display each image. */
-            frame_time: {
+            /** Duration to display each target image. */
+            target_frame_time: {
                 type: jspsych.ParameterType.INT,
                 pretty_name: "Frame time",
-                default: 1000,
+                default: 250,//ms
+            },
+             /** Duration to display each distractor image. */
+             distractor_frame_time: {
+                type: jspsych.ParameterType.INT,
+                pretty_name: "Frame time",
+                default: 0.04,//ms
+            },
+             /** Length of gap to be shown between target and distractor. */
+             stim_isi: {
+                type: jspsych.ParameterType.INT,
+                pretty_name: "Target and distractor gap",
+                default: 0 ,
             },
             /** Length of gap to be shown between each image. */
             frame_isi: {
                 type: jspsych.ParameterType.INT,
                 pretty_name: "Frame gap",
-                default: 1000,
+                default: 0 ,
             },
              /** Number of times to show entire sequence */
             sequence_reps: {
@@ -58,10 +76,10 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                 pretty_name: "Prompt",
                 default: null,
             },
-            /** How long to show the stimulus. */
-            stimulus_duration: {
+            /** How long to show the target stimulus. */
+            target_duration: {
                 type: jspsych.ParameterType.INT,
-                pretty_name: "Stimulus duration",
+                pretty_name: "Target stimulus duration",
                 default: null,
             },
             /** How long to show trial before it ends */
@@ -74,7 +92,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
             response_ends_trial: {
                 type: jspsych.ParameterType.BOOL,
                 pretty_name: "Response ends trial",
-                default: true,
+                default: false,
             },
             /** How many oris are we constructing */
             set_size: {
@@ -204,6 +222,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                 startTrial();
             }
 
+            //get info to draw items and show them
             if (trial.item_angles.length == 0 ) {
                 item_angles = GetOrisForTrial(trial.set_size, trial.min_difference);
             }
@@ -241,7 +260,8 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                         ctx.drawImage(img, 0, 0, width, height);
                     }
                     // Rotate the canvas
-                    ctx.rotate((-item_angles[0] * Math.PI) / 180 ); // will need to update item_angles counter ??
+                    var rotation = -item_angles[0] // change rotation for target
+                    ctx.rotate((rotation * Math.PI) / 180 ); 
 
                     // Draw a dot at the center of image
                     var centerX = canvas.width / 2;
@@ -253,44 +273,20 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                     ctx.arc(centerX, centerY, dotSize, 0, 2 * Math.PI);
                     ctx.fill();                    
                 };
-
-                //preload images for each trial
-                // old code img.src = trial.stimulus;
-                // load targets phase 1 and 2 randomly from 1 through 500
+                /** TARGET Display */
+                //preload targets for each trial
                 var targets = [];
                 var numberOfTargets = 2;
                 var minNumber = 1;
                 var maxNumber = 500;
-                for (var i = 0; i < numberOfTargets; i++) {
+                for (var i = 0; i < numberOfTargets; i++) {// load targets phase 1 and 2 randomly from 1 through 500
                     var randomTarget = Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
                     var Target1Path = 'images/targets/Target_k' + trial.kappa + 'p1n' + randomTarget + '.png';
                     var Target2Path = 'images/targets/Target_k' + trial.kappa + 'p2n' + randomTarget + '.png';
                     targets.push(Target1Path, Target2Path);
                 }
-                // load distractors 10 randomly from 1 through 500
-                var distractors = [];
-                var numberOfDistractors = 10;
-                if (trial.distractor === 2 || trial.distractor === 3) {
-                    for (var i = 0; i < numberOfDistractors; i++) {
-                        var randomDistractor = Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
-                        var distractorPath = 'images/distractors/distractor_n' + randomDistractor + '.png';
-                        distractors.push(distractorPath);
-                    }
-                }
-                else { //if absent trial
-                    for (var i = 0; i < numberOfDistractors; i++) {
-                        var distractorPath = 'images/blank/blank.png';
-                        distractors.push(distractorPath);}
-                }
-                // set stimuli based on time ??
-                stimuli = [];
-                if (interval_time < 500){
-                    stimuli = targets;
-                }
-                else if (interval_time >500) {
-                    stimuli = distractors;
-                }
-                img.src = stimuli[animate_frame]; // does animate_frame work here??
+
+                img.src = targets[0]; // just use target to calculate size
                 // get/set image height and width - this can only be done after image loads because uses image's naturalWidth/naturalHeight properties
                 const getHeightWidth = () => {
                     if (trial.stimulus_height !== null) {
@@ -341,7 +337,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
 
                 //
                 var animate_interval = setInterval(() => {
-                    var showImage = true;
+                    var showTargetImage = true;
                     if (!trial.render_on_canvas) {
                         display_element.innerHTML = ""; // clear everything
                     }
@@ -355,17 +351,17 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                             showImage = false;
                         }
                     }
-                    if (showImage) {
-                        show_next_frame();
+                    if (showTargetImage) {
+                        show_next_target_frame();
                     }
                 }, interval_time);
 
-                const show_next_frame = () => {
+                const show_next_target_frame = () => {
                     if (trial.render_on_canvas) {
                         display_element.querySelector("#jspsych-animation-image").style.visibility =
                             "visible";
                         var img = new Image();
-                        img.src = stimuli[animate_frame];
+                        img.src = targets[animate_frame];
                         canvas.height = img.naturalHeight;
                         canvas.width = img.naturalWidth;
                         ctx.drawImage(img, 0, 0);
@@ -376,7 +372,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                     else {
                         // show image
                         display_element.innerHTML =
-                            '<img src="' + stimuli[animate_frame] + '" id="jspsych-animation-image"></img>';
+                            '<img src="' + targets[animate_frame] + '" id="jspsych-animation-image"></img>';
                         if (trial.prompt !== null) {
                             display_element.innerHTML += trial.prompt;
                         }
@@ -384,7 +380,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                     current_stim = stimuli[animate_frame];
                     // record when image was shown
                     animation_sequence.push({
-                        stimulus: stimuli[animate_frame],
+                        stimulus: targets[animate_frame],
                         time: Math.round(performance.now() - startTime),
                     });
                     if (trial.frame_isi > 0) {
@@ -421,7 +417,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                     allow_held_key: false,
                 });
                 // show the first frame immediately
-                show_next_frame();
+                show_next_target_frame();
 
             }
             /* not using this because will be drawing as a canvas element only
@@ -475,7 +471,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                 // gather the data to store for the trial
                 var trial_data = {
                     rt: response.rt,
-                    stimulus: trial.stimulus,
+                    stimulus: targets,
                     response: response.key,
                 };
                 // clear the display
@@ -522,7 +518,25 @@ var jsPsychImageDistractResponse = (function (jspsych) {
             else if (trial.response_ends_trial === false) {
                 console.warn("The experiment may be deadlocked. Try setting a trial duration or set response_ends_trial to true.");
             }
+            
+            /** Distractor */
+             // load distractors 75?? or 15 * 5?  randomly from 1 through 500
+             var distractors = [];
+             var numberOfDistractors = 75;
+             if (trial.distractor === 2 || trial.distractor === 3) {
+                 for (var i = 0; i < numberOfDistractors; i++) {
+                     var randomDistractor = Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
+                     var distractorPath = 'images/distractors/distractor_n' + randomDistractor + '.png';
+                     distractors.push(distractorPath);
+                 }
+             }
+             else { //if absent trial
+                 for (var i = 0; i < numberOfDistractors; i++) {
+                     var distractorPath = 'images/blank/blank.png';
+                     distractors.push(distractorPath);}
+             }
         }
+
        /* not using this I think ?? simulate(trial, simulation_mode, simulation_options, load_callback) {
             if (simulation_mode == "data-only") {
                 load_callback();
