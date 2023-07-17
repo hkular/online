@@ -290,7 +290,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                 if (ts <= target_duration){
                     img.src = targets[animate_frame];} 
                 else if (ts >= target_duration && ts <= target_duration + distractor_duration){
-                    img.src = distractors[animate_frame];}
+                    img.src = distractors[animate_frame];} // !!! figure out how to randomize distractor frame and wiggle later
                 // get/set image height and width - this can only be done after image loads because uses image's naturalWidth/naturalHeight properties
                 const getHeightWidth = () => {
                     if (trial.stimulus_height !== null) {
