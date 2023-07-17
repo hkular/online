@@ -285,10 +285,11 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                     var Target2Path = 'images/targets/Target_k' + trial.kappa + 'p2n' + randomTarget + '.png';
                     targets.push(Target1Path, Target2Path);
                 }
-                // !!! pick up here
+
+                //set image src by frame and time
                 if (ts <= target_duration){
-                    img.src = targets[animate_frame];} // just use target to calculate size
-                else if (ts >= target_duration && ts <= ){
+                    img.src = targets[animate_frame];} 
+                else if (ts >= target_duration && ts <= target_duration + distractor_duration){
                     img.src = distractors[animate_frame];}
                 // get/set image height and width - this can only be done after image loads because uses image's naturalWidth/naturalHeight properties
                 const getHeightWidth = () => {
@@ -315,6 +316,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                     canvas.height = height;
                     canvas.width = width;
                 };
+
                 getHeightWidth(); // call now, in case image loads immediately (is cached)
                 // add canvas and draw image
                 display_element.insertBefore(canvas, null);
