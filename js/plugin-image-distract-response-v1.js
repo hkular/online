@@ -1,4 +1,4 @@
-var jsPsychImageDistractResponse = (function (jspsych) {
+var jsPsychImageDistractResponse = (function (jsPsych) {
     'use strict';
 
     const info = {
@@ -6,97 +6,97 @@ var jsPsychImageDistractResponse = (function (jspsych) {
         parameters: {
             /** The target image to be displayed */
             target: {
-                type: jspsych.ParameterType.IMAGE,
+                type: jsPsych.ParameterType.IMAGE,
                 pretty_name: "Target",
                 default: undefined,
             },
              /** The distractor image to be displayed */
              distractor: {
-                type: jspsych.ParameterType.IMAGE,
+                type: jsPsych.ParameterType.IMAGE,
                 pretty_name: "Distractor",
                 default: undefined,
             },
             /** Set the image height in pixels */
             stimulus_height: {
-                type: jspsych.ParameterType.INT,
+                type: jsPsych.ParameterType.INT,
                 pretty_name: "Image height",
                 default: 520,
             },
             /** Set the image width in pixels */
             stimulus_width: {
-                type: jspsych.ParameterType.INT,
+                type: jsPsych.ParameterType.INT,
                 pretty_name: "Image width",
                 default: 520,
             },
             /** Maintain the aspect ratio after setting width or height */
             maintain_aspect_ratio: {
-                type: jspsych.ParameterType.BOOL,
+                type: jsPsych.ParameterType.BOOL,
                 pretty_name: "Maintain aspect ratio",
                 default: true,
             },
             /** Duration to display each target image. */
             target_frame_time: {
-                type: jspsych.ParameterType.INT,
+                type: jsPsych.ParameterType.INT,
                 pretty_name: "Frame time",
                 default: 250,//ms
             },
              /** Duration to display each distractor image. */
              distractor_frame_time: {
-                type: jspsych.ParameterType.INT,
+                type: jsPsych.ParameterType.INT,
                 pretty_name: "Frame time",
                 default: 0.04,//ms
             },
              /** Length of gap to be shown between target and distractor. */
              stim_isi: {
-                type: jspsych.ParameterType.INT,
+                type: jsPsych.ParameterType.INT,
                 pretty_name: "Target and distractor gap",
                 default: 0 ,
             },
             /** Length of gap to be shown between each image. */
             frame_isi: {
-                type: jspsych.ParameterType.INT,
+                type: jsPsych.ParameterType.INT,
                 pretty_name: "Frame gap",
                 default: 0 ,
             },
              /** Number of times to show entire sequence */
             sequence_reps: {
-            type: jspsych.ParameterType.INT,
+            type: jsPsych.ParameterType.INT,
             pretty_name: "Sequence repetitions",
             default: 1,
              },
             /** Array containing the key(s) the subject is allowed to press to respond to the stimulus. */
             choices: {
-                type: jspsych.ParameterType.KEYS,
+                type: jsPsych.ParameterType.KEYS,
                 pretty_name: "Choices",
                 default: "ALL_KEYS",
             },
             /** Any content here will be displayed below the stimulus. */
             prompt: {
-                type: jspsych.ParameterType.HTML_STRING,
+                type: jsPsych.ParameterType.HTML_STRING,
                 pretty_name: "Prompt",
                 default: null,
             },
             /** How long to show the target stimulus. */
             target_duration: {
-                type: jspsych.ParameterType.INT,
+                type: jsPsych.ParameterType.INT,
                 pretty_name: "Target stimulus duration",
                 default: null,
             },
             /** How long to show trial before it ends */
             trial_duration: {
-                type: jspsych.ParameterType.INT,
+                type: jsPsych.ParameterType.INT,
                 pretty_name: "Trial duration",
                 default: null,
             },
             /** If true, trial will end when subject makes a response. */
             response_ends_trial: {
-                type: jspsych.ParameterType.BOOL,
+                type: jsPsych.ParameterType.BOOL,
                 pretty_name: "Response ends trial",
                 default: false,
             },
             /** How many oris are we constructing */
             set_size: {
-                type: jspsych.ParameterType.INT,
+                type: jsPsych.ParameterType.INT,
                 pretty_name: "Set size",
                 default: 3,//target, distractor, response
             },
@@ -105,7 +105,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
              * If false, the image will be shown via an img element.
              */
             render_on_canvas: {
-                type: jspsych.ParameterType.BOOL,
+                type: jsPsych.ParameterType.BOOL,
                 pretty_name: "Render on canvas",
                 default: true,
             },
