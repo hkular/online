@@ -286,7 +286,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                     targets.push(Target1Path, Target2Path);
                 }
 
-                //set image src by frame and time
+                /*set image src by frame and type -- figure this out later for now just do targets
                 if (ts <= target_duration){
                     img.src = targets[animate_frame];} 
                 else if (ts >= target_duration && ts <= target_duration + distractor_duration){
@@ -315,7 +315,7 @@ var jsPsychImageDistractResponse = (function (jspsych) {
                     }
                     canvas.height = height;
                     canvas.width = width;
-                };
+                };*/
 
                 getHeightWidth(); // call now, in case image loads immediately (is cached)
                 // add canvas and draw image
